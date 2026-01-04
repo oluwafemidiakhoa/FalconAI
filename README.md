@@ -120,26 +120,98 @@ falcon-ai wow --config configs/wow.yaml
 
 ## 🎨 Live Dashboard (Production-Ready!)
 
-**Access the beautiful real-time dashboard at `http://127.0.0.1:8002`**
+**Launch with one command:**
+```bash
+falcon-ai serve --config configs/wow.yaml --port 8002
+```
 
-![Dashboard Preview](https://via.placeholder.com/800x400/00D4AA/FFFFFF?text=FALCON-AI+Live+Dashboard)
+The dashboard automatically opens in your browser at `http://127.0.0.1:8002`
 
-**Features:**
-- 📊 **Live Event Stream** - Watch decisions in real-time
-- 🎯 **Flight Summary** - Success rate, trigger rate, false positives/negatives
-- 🧠 **Decision Stack** - Current action, confidence, reasoning
-- ⚡ **Energy & Memory** - Resource usage tracking
-- 📈 **Telemetry Charts** - Confidence, trigger rate, energy, memory
-- 🤖 **Swarm Consensus** - Multi-agent voting breakdown
-- 📋 **Benchmark Results** - Performance across scenarios
+### Dashboard Overview
 
-**Controls:**
-- Switch scenarios (Spike, Attack, Drift)
-- Toggle modes (Single, Swarm)
-- Adjust tick interval
-- Pause/Resume
-- Presentation mode
-- Export JSON snapshots
+![FALCON-AI Dashboard - Main View](docs/screenshots/dashboard_main.png)
+*Real-time dashboard showing selective intelligence in motion*
+
+**Key Panels:**
+
+#### 📊 Flight Summary (LIVE)
+- **Success Rate:** 100.0% - Perfect detection accuracy
+- **Trigger Rate:** 10.1% - Highly selective (only acts on relevant events)
+- **False Positives:** 0 - No incorrect alerts
+- **False Negatives:** 0 - No missed events
+- **Live Sparkline:** Visual performance indicator
+
+#### 🧠 Decision Stack
+- Current action being taken
+- Confidence level (0.0 - 1.0)
+- Reasoning explanation
+- Real-time updates
+
+#### ⚡ Energy + Memory
+- **Energy Used:** Live tracking (e.g., 1900 operations)
+- **Energy Remaining:** Percentage available
+- **Memory Size:** Number of learned experiences (e.g., 14)
+- **Memory Type:** EXPERIENCE (learns from outcomes)
+
+#### 📈 Telemetry Charts
+Four real-time graphs showing:
+- **Confidence:** Decision confidence over time
+- **Trigger Rate:** Event detection frequency
+- **Energy Remaining:** Resource budget tracking
+- **Memory Size:** Learning accumulation
+
+#### 🤖 Swarm Consensus
+- **Action Voting:** Escalate, Intervene, Alert, Observe counts
+- **Pool Size:** Shared experience pool (e.g., Pool: 8)
+- **Delta:** Swarm improvement vs solo (+0.0%)
+- Multi-agent coordination visualization
+
+#### 📋 Benchmark Snapshot
+Performance across configurations:
+- **spike/threshold/simple:** 100.0% success
+- **spike/threshold/adaptive:** 100.0% success
+- **spike/threshold/multi_tier:** 100.0% success
+- **spike/hybrid/simple:** 100.0% success
+- Best configurations highlighted
+
+#### 🎬 Live Event Stream
+Real-time event processing display:
+- **ACTION** events (red) - Events requiring intervention
+- **IGNORE** events (gray) - Normal events filtered out
+- Confidence scores for each decision
+- Reasoning: "escalate", "none", etc.
+
+### Interactive Controls
+
+**Top Controls:**
+- **Scenario:** Spike, Attack, Drift, Pulse
+- **Mode:** Solo agent or Swarm (multiple agents)
+- **Interval:** Tick speed (100ms - 2000ms slider)
+- **Pause/Resume:** Control simulation
+- **Showcase:** Toggle benchmark display
+- **Export:** Download JSON snapshot
+- **Presentation:** Clean view for demos
+
+### Screenshots
+
+![Flight Summary](docs/screenshots/flight_summary.png)
+*100% success rate with 10.1% trigger rate - highly selective and accurate*
+
+![Telemetry & Swarm](docs/screenshots/telemetry_swarm.png)
+*Real-time telemetry charts and swarm consensus voting*
+
+![Event Stream & Benchmarks](docs/screenshots/events_benchmarks.png)
+*Live event stream with benchmark performance comparison*
+
+### What Makes It Special
+
+- ✅ **Real-time updates** - See decisions as they happen
+- ✅ **Beautiful visualization** - Professional, clean design
+- ✅ **Interactive controls** - Change scenarios on the fly
+- ✅ **Swarm intelligence** - Watch agents coordinate
+- ✅ **Performance metrics** - Live success rates and statistics
+- ✅ **Export capability** - Download data as JSON
+- ✅ **Presentation mode** - Perfect for demos
 
 ---
 
