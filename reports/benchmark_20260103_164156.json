@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-01-03T16:41:56.389420Z",
+  "scenarios": [
+    "spike"
+  ],
+  "decisions": [
+    "heuristic",
+    "hybrid"
+  ],
+  "energies": [
+    "simple"
+  ],
+  "repeats": 1,
+  "results": [
+    {
+      "scenario": "spike",
+      "decision": "heuristic",
+      "energy": "simple",
+      "duration_s": 0.0015984960191417485,
+      "metrics": {
+        "total_events": 500.0,
+        "actionable_events": 46.0,
+        "decisions_made": 46.0,
+        "actions_taken": 46.0,
+        "correct_actions": 500.0,
+        "false_positives": 0.0,
+        "false_negatives": 0.0,
+        "avg_reward": 0.2368,
+        "avg_confidence": 0.6,
+        "avg_latency_ms": 0.0006373253418132663,
+        "trigger_rate": 0.092,
+        "success_rate": 1.0,
+        "energy_used": 4600.0,
+        "energy_remaining_fraction": 0.07999999999999996,
+        "memory_size": 0.0
+      }
+    },
+    {
+      "scenario": "spike",
+      "decision": "hybrid",
+      "energy": "simple",
+      "duration_s": 0.0010547690035309643,
+      "metrics": {
+        "total_events": 500.0,
+        "actionable_events": 46.0,
+        "decisions_made": 46.0,
+        "actions_taken": 46.0,
+        "correct_actions": 500.0,
+        "false_positives": 0.0,
+        "false_negatives": 0.0,
+        "avg_reward": 0.2736,
+        "avg_confidence": 1.0,
+        "avg_latency_ms": 0.0004906960530206561,
+        "trigger_rate": 0.092,
+        "success_rate": 1.0,
+        "energy_used": 4600.0,
+        "energy_remaining_fraction": 0.07999999999999996,
+        "memory_size": 0.0
+      }
+    }
+  ]
+}

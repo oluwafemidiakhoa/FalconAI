@@ -1,0 +1,31 @@
+falcon:
+  perception:
+    type: threshold
+    params:
+      threshold: 0.5
+  decision:
+    type: memory_aware
+    params:
+      memory_weight: 0.35
+  correction:
+    type: outcome_based
+    params:
+      learning_rate: 0.1
+  energy:
+    type: simple
+    params:
+      max_operations: 5000
+  memory:
+    type: experience
+    params:
+      max_size: 1000
+  monitoring: true
+
+scenario:
+  name: spike
+  length: 500
+  seed: 42
+
+output:
+  metrics_path: reports/metrics.json
+  checkpoint_path: checkpoints/falcon_run

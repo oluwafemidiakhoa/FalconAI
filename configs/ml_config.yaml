@@ -1,0 +1,48 @@
+# ML-Powered FALCON-AI Configuration
+# Neural network perception with ML-based decisions
+# Good for: Complex patterns, high accuracy requirements, adaptive learning
+
+falcon:
+  perception:
+    type: online_neural
+    params:
+      input_dim: 5
+      window_size: 100
+      adaptation_rate: 0.1
+
+  decision:
+    type: ml_decision
+    params:
+      model_type: random_forest
+      n_estimators: 100
+      max_depth: 10
+
+  correction:
+    type: bayesian
+    params:
+      prior_alpha: 1.0
+      prior_beta: 1.0
+
+  energy:
+    type: adaptive
+    params:
+      max_operations: 5000
+      max_latency_ms: 100.0
+      max_energy_units: 1000.0
+      adaptation_rate: 0.15
+
+  memory:
+    type: experience
+    params:
+      max_size: 2000
+
+  monitoring: true
+
+scenario:
+  name: attack
+  length: 1000
+  seed: 42
+
+output:
+  metrics_path: reports/ml_metrics.json
+  checkpoint_path: checkpoints/ml_falcon

@@ -25,7 +25,8 @@ from .decision import (
     HeuristicDecision,
     ThresholdDecision,
     RuleBasedDecision,
-    HybridDecision
+    HybridDecision,
+    MemoryAwareDecision,
 )
 
 # Layer 3: Correction
@@ -83,6 +84,7 @@ __all__ = [
     'ThresholdDecision',
     'RuleBasedDecision',
     'HybridDecision',
+    'MemoryAwareDecision',
 
     # Correction
     'CorrectionLoop',

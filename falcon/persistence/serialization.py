@@ -76,7 +76,7 @@ def save_falcon(falcon: FalconAI,
     }
 
     with open(metadata_path, 'w') as f:
-        json.dump(metadata, f, indent=2)
+        json.dump(metadata, f, indent=2, default=_json_default)
 
     print(f"[OK] FALCON model saved to {model_path}")
     print(f"[OK] Metadata saved to {metadata_path}")
@@ -149,7 +149,7 @@ def export_metrics(falcon: FalconAI, filepath: str) -> Path:
     metrics['export_timestamp'] = datetime.now().isoformat()
 
     with open(filepath, 'w') as f:
-        json.dump(metrics, f, indent=2)
+        json.dump(metrics, f, indent=2, default=_json_default)
 
     print(f"[OK] Metrics exported to {filepath}")
     return filepath
@@ -171,3 +171,19 @@ def import_metrics(filepath: str) -> Dict[str, Any]:
         metrics = json.load(f)
 
     return metrics
+
+
+def _json_default(obj: Any):
+    if hasattr(obj, "tolist"):
+        try:
+            return obj.tolist()
+        except Exception:
+            pass
+    if hasattr(obj, "item"):
+        try:
+            return obj.item()
+        except Exception:
+            pass
+    if isinstance(obj, set):
+        return list(obj)
+    return str(obj)

@@ -42,17 +42,17 @@ class ComputeBudget:
     def consume(self, operations: int = 0, latency_ms: float = 0.0,
                 energy_units: float = 0.0):
         """Consume budget"""
-        self.used_operations += operations
-        self.used_latency_ms += latency_ms
-        self.used_energy_units += energy_units
+        self.used_operations = min(self.used_operations + operations, self.max_operations)
+        self.used_latency_ms = min(self.used_latency_ms + latency_ms, self.max_latency_ms)
+        self.used_energy_units = min(self.used_energy_units + energy_units, self.max_energy_units)
 
     def remaining_fraction(self) -> float:
         """Get fraction of budget remaining (0.0 to 1.0)"""
         op_remaining = 1.0 - (self.used_operations / max(self.max_operations, 1))
         latency_remaining = 1.0 - (self.used_latency_ms / max(self.max_latency_ms, 1))
         energy_remaining = 1.0 - (self.used_energy_units / max(self.max_energy_units, 1))
-
-        return min(op_remaining, latency_remaining, energy_remaining)
+        remaining = min(op_remaining, latency_remaining, energy_remaining)
+        return max(0.0, min(remaining, 1.0))
 
     def reset(self):
         """Reset budget usage"""

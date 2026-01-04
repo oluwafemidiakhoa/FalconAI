@@ -1,0 +1,45 @@
+# Fraud Detection Configuration
+# Optimized for detecting fraudulent transactions and anomalous behavior
+# Good for: Financial fraud, payment anomalies, unusual patterns
+
+falcon:
+  perception:
+    type: change_detection
+    params:
+      change_threshold: 0.25
+      window_size: 15
+
+  decision:
+    type: threshold
+    params:
+      alert_threshold: 0.5
+      intervene_threshold: 0.75
+      escalate_threshold: 0.9
+
+  correction:
+    type: outcome_based
+    params:
+      learning_rate: 0.08
+      abort_threshold: -8.0
+
+  energy:
+    type: simple
+    params:
+      max_operations: 15000
+
+  memory:
+    type: experience
+    params:
+      max_size: 3000
+
+  monitoring: true
+
+scenario:
+  name: drift
+  length: 2000
+  seed: 789
+
+output:
+  metrics_path: reports/fraud_metrics.json
+  checkpoint_path: checkpoints/fraud_falcon
+  report_dir: reports/fraud_detection

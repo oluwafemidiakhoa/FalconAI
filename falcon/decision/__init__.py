@@ -10,7 +10,8 @@ from .policies import (
     HeuristicDecision,
     ThresholdDecision,
     RuleBasedDecision,
-    HybridDecision
+    HybridDecision,
+    MemoryAwareDecision,
 )
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     'HeuristicDecision',
     'ThresholdDecision',
     'RuleBasedDecision',
-    'HybridDecision'
+    'HybridDecision',
+    'MemoryAwareDecision'
 ]

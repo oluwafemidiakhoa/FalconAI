@@ -231,3 +231,118 @@ class HybridDecision(DecisionCore):
         learning_rate = 0.1
         target = 1.0 if success else 0.0
         self.pattern_weights[pattern_key] += learning_rate * (target - self.pattern_weights[pattern_key])
+
+
+class MemoryAwareDecision(DecisionCore):
+    """
+    Decision core that incorporates memory and swarm context signals.
+    """
+
+    def __init__(self, memory_weight: float = 0.35, min_samples: int = 3):
+        """
+        Args:
+            memory_weight: How strongly to weight memory signals (0.0 to 1.0)
+            min_samples: Minimum samples needed to trust swarm memory
+        """
+        super().__init__()
+        self.memory_weight = memory_weight
+        self.min_samples = min_samples
+
+    def decide(self, event: Any, context: Optional[Dict[str, Any]] = None) -> Decision:
+        self.decisions_made += 1
+
+        if isinstance(event, Event):
+            event_type = event.event_type
+            salience = event.salience_score
+        else:
+            event_type = EventType.NORMAL
+            salience = 0.5
+
+        # Base heuristic decision
+        if event_type == EventType.CRITICAL:
+            base_action = ActionType.ESCALATE
+            base_confidence = min(0.9 * salience, 1.0)
+            reasoning = "Critical event detected - escalating"
+        elif event_type == EventType.ANOMALY:
+            base_action = ActionType.ALERT
+            base_confidence = 0.7 * salience
+            reasoning = "Anomaly detected - raising alert"
+        elif event_type == EventType.SALIENT:
+            base_action = ActionType.INTERVENE if salience > 0.7 else ActionType.ALERT
+            base_confidence = 0.6 * salience
+            reasoning = "Salient event - memory-aware decision"
+        else:
+            base_action = ActionType.OBSERVE
+            base_confidence = 0.5
+            reasoning = "Normal event - continuing observation"
+
+        memory_action = None
+        memory_confidence = None
+        memory_samples = 0
+
+        def _coerce_action(value: Any) -> Optional[ActionType]:
+            if isinstance(value, ActionType):
+                return value
+            if isinstance(value, str):
+                try:
+                    return ActionType(value)
+                except Exception:
+                    return None
+            return None
+
+        if context:
+            past_experience = context.get("past_experience")
+            if past_experience is not None:
+                reward = getattr(past_experience, "reward", None)
+                action = getattr(past_experience, "action", None)
+                if reward is not None and action is not None:
+                    memory_samples = 1
+                    memory_action = _coerce_action(action)
+                    memory_confidence = max(min(0.5 + float(reward), 1.0), 0.0)
+
+            swarm_experiences = context.get("swarm_experiences") or []
+            if swarm_experiences:
+                action_rewards: Dict[str, List[float]] = {}
+                for exp in swarm_experiences:
+                    exp_action = getattr(exp, "action", None)
+                    exp_reward = getattr(exp, "reward", None)
+                    if exp_action is None or exp_reward is None:
+                        continue
+                    action_rewards.setdefault(str(exp_action), []).append(float(exp_reward))
+
+                if action_rewards:
+                    memory_samples = max(memory_samples, max(len(v) for v in action_rewards.values()))
+                    best_action = None
+                    best_avg = float("-inf")
+                    for act, rewards in action_rewards.items():
+                        avg_reward = sum(rewards) / len(rewards)
+                        if avg_reward > best_avg:
+                            best_avg = avg_reward
+                            best_action = act
+
+                    if best_action is not None and memory_samples >= self.min_samples:
+                        memory_action = _coerce_action(best_action)
+                        memory_confidence = max(min(0.5 + best_avg, 1.0), 0.0)
+
+        action = base_action
+        confidence = base_confidence
+
+        if memory_action is not None and memory_confidence is not None:
+            if memory_action != base_action and memory_confidence > 0.55:
+                action = memory_action
+                reasoning = "Memory override based on shared experience"
+            confidence = (1 - self.memory_weight) * base_confidence + self.memory_weight * memory_confidence
+
+        self.total_confidence += confidence
+
+        return Decision(
+            action=action,
+            confidence=min(max(confidence, 0.0), 1.0),
+            reasoning=reasoning,
+            metadata={
+                "event_type": event_type.value if isinstance(event_type, EventType) else "unknown",
+                "memory_action": memory_action.value if memory_action else None,
+                "memory_confidence": memory_confidence,
+                "memory_samples": memory_samples,
+            },
+        )

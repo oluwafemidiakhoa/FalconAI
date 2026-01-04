@@ -1,0 +1,41 @@
+# High-Performance Configuration
+# Minimal perception, fast heuristics, optimized for throughput
+# Good for: High-volume streams, low-latency requirements, resource-constrained environments
+
+falcon:
+  perception:
+    type: threshold
+    params:
+      threshold: 0.8
+
+  decision:
+    type: heuristic
+    params:
+      confidence_boost: 0.05
+
+  correction:
+    type: outcome_based
+    params:
+      learning_rate: 0.05
+      abort_threshold: -3.0
+
+  energy:
+    type: simple
+    params:
+      max_operations: 50000
+
+  memory:
+    type: experience
+    params:
+      max_size: 100
+
+  monitoring: false  # Disable monitoring for max performance
+
+scenario:
+  name: pulse
+  length: 5000
+  seed: 999
+
+output:
+  metrics_path: reports/high_perf_metrics.json
+  checkpoint_path: checkpoints/high_perf_falcon

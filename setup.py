@@ -10,6 +10,9 @@ setup(
         "numpy>=1.24.0",
         "scipy>=1.10.0",
         "scikit-learn>=1.3.0",
+        "fastapi>=0.103.0",
+        "uvicorn>=0.23.2",
+        "pyyaml>=6.0.1",
     ],
     python_requires=">=3.8",
     classifiers=[
@@ -21,4 +24,13 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
+    include_package_data=True,
+    package_data={
+        "falcon.api": ["static/*"],
+    },
+    entry_points={
+        "console_scripts": [
+            "falcon-ai=falcon.cli:main",
+        ]
+    },
 )

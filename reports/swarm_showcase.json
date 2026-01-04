@@ -1,0 +1,41 @@
+{
+  "swarm_metrics": {
+    "total_events": 500,
+    "actionable_events": 46,
+    "decisions_made": 46,
+    "actions_taken": 46,
+    "correct_actions": 500,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "avg_reward": 0.2736,
+    "avg_confidence": 1.0,
+    "avg_latency_ms": 0.0,
+    "trigger_rate": 0.092,
+    "success_rate": 1.0,
+    "energy_used": 4600,
+    "energy_remaining_fraction": 0.07999999999999996,
+    "memory_size": 92
+  },
+  "solo_metrics": {
+    "total_events": 500,
+    "actionable_events": 46,
+    "decisions_made": 46,
+    "actions_taken": 46,
+    "correct_actions": 500,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "avg_reward": 0.2644,
+    "avg_confidence": 0.9,
+    "avg_latency_ms": 0.0,
+    "trigger_rate": 0.092,
+    "success_rate": 1.0,
+    "energy_used": 4600,
+    "energy_remaining_fraction": 0.07999999999999996,
+    "memory_size": 46
+  },
+  "delta": {
+    "success_rate": 0.0,
+    "avg_reward": 0.009199999999999986,
+    "trigger_rate": 0.0
+  }
+}

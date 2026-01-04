@@ -1,0 +1,55 @@
+# Composite Perception Configuration
+# Combines multiple perception engines for comprehensive coverage
+# Good for: Complex scenarios requiring multi-faceted analysis
+
+falcon:
+  perception:
+    type: composite
+    params:
+      engines:
+        - type: threshold
+          params:
+            threshold: 0.6
+        - type: anomaly
+          params:
+            z_threshold: 2.0
+            min_samples: 15
+        - type: change_detection
+          params:
+            change_threshold: 0.3
+            window_size: 10
+
+  decision:
+    type: hybrid
+    params:
+      use_learned_patterns: true
+
+  correction:
+    type: bayesian
+    params:
+      prior_alpha: 2.0
+      prior_beta: 1.0
+
+  energy:
+    type: adaptive
+    params:
+      max_operations: 6000
+      max_latency_ms: 150.0
+      max_energy_units: 900.0
+      adaptation_rate: 0.1
+
+  memory:
+    type: experience
+    params:
+      max_size: 1000
+
+  monitoring: true
+
+scenario:
+  name: spike
+  length: 800
+  seed: 456
+
+output:
+  metrics_path: reports/composite_metrics.json
+  checkpoint_path: checkpoints/composite_falcon

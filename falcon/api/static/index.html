@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FALCON-AI Live Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">FALCON-AI</p>
+        <h1>Selective Intelligence in Motion</h1>
+        <p class="subtitle">Real-time perception, decisions, energy, memory, and swarm consensus.</p>
+      </div>
+      <div class="hero-card">
+        <div class="hero-metric">
+          <span>Scenario</span>
+          <strong id="scenarioName">spike</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Mode</span>
+          <strong id="modeName">swarm</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Tick</span>
+          <strong id="tickRate">500 ms</strong>
+        </div>
+        <div class="hero-metric wide">
+          <span>Last Event</span>
+          <strong id="lastEvent">--</strong>
+          <div class="hero-sub">
+            <span id="lastValue">--</span>
+            <span id="pulseDot" class="pulse-dot"></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls panel">
+      <div class="control-row">
+        <div class="control-group">
+          <label for="scenarioSelect">Scenario</label>
+          <select id="scenarioSelect">
+            <option value="spike">Spike</option>
+            <option value="drift">Drift</option>
+            <option value="attack">Attack</option>
+            <option value="pulse">Pulse</option>
+            <option value="noise">Noise</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="modeSelect">Mode</label>
+          <select id="modeSelect">
+            <option value="swarm">Swarm</option>
+            <option value="solo">Solo</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="intervalRange">Interval</label>
+          <input id="intervalRange" type="range" min="100" max="1500" step="100" value="500" />
+          <span id="intervalValue">500 ms</span>
+        </div>
+        <div class="control-group">
+          <button id="toggleRun" class="primary">Pause</button>
+        </div>
+      </div>
+      <div class="control-row secondary">
+        <div class="control-group">
+          <label>Showcase</label>
+          <button id="toggleShowcase" class="ghost">Off</button>
+        </div>
+        <div class="control-group">
+          <label>Export</label>
+          <button id="exportSnapshot" class="ghost">Download JSON</button>
+        </div>
+        <div class="control-group">
+          <label>Presentation</label>
+          <button id="togglePresentation" class="ghost">Off</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="dashboard">
+      <section class="panel highlight">
+        <div class="section-title">
+          <h2>Flight Summary</h2>
+          <span class="pulse-label">live</span>
+        </div>
+        <div class="stats-grid">
+          <div>
+            <span class="label">Success Rate</span>
+            <strong id="successRate">0%</strong>
+          </div>
+          <div>
+            <span class="label">Trigger Rate</span>
+            <strong id="triggerRate">0%</strong>
+          </div>
+          <div>
+            <span class="label">False Positives</span>
+            <strong id="falsePos">0</strong>
+          </div>
+          <div>
+            <span class="label">False Negatives</span>
+            <strong id="falseNeg">0</strong>
+          </div>
+        </div>
+        <div class="sparkline">
+          <canvas id="confidenceSpark" width="320" height="60"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Decision Stack</h2>
+        <div class="decision-card" id="decisionCard">
+          <div>
+            <span class="label">Action</span>
+            <strong id="decisionAction">-</strong>
+          </div>
+          <div>
+            <span class="label">Confidence</span>
+            <strong id="decisionConfidence">-</strong>
+          </div>
+          <div class="full">
+            <span class="label">Reasoning</span>
+            <p id="decisionReasoning">Waiting for signal...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Energy + Memory</h2>
+        <div class="stats-grid">
+          <div>
+            <span class="label">Energy Used</span>
+            <strong id="energyUsed">0</strong>
+          </div>
+          <div>
+            <span class="label">Energy Remaining</span>
+            <strong id="energyRemaining">100%</strong>
+          </div>
+          <div>
+            <span class="label">Memory Size</span>
+            <strong id="memorySize">0</strong>
+          </div>
+          <div>
+            <span class="label">Memory Type</span>
+            <strong id="memoryType">-</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel telemetry">
+        <h2>Telemetry</h2>
+        <div class="telemetry-grid">
+          <div class="telemetry-card">
+            <span class="label">Confidence</span>
+            <canvas id="trendConfidence" width="220" height="70"></canvas>
+          </div>
+          <div class="telemetry-card">
+            <span class="label">Trigger Rate</span>
+            <canvas id="trendTrigger" width="220" height="70"></canvas>
+          </div>
+          <div class="telemetry-card">
+            <span class="label">Energy Remaining</span>
+            <canvas id="trendEnergy" width="220" height="70"></canvas>
+          </div>
+          <div class="telemetry-card">
+            <span class="label">Memory Size</span>
+            <canvas id="trendMemory" width="220" height="70"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Swarm Consensus</h2>
+        <div class="consensus" id="consensusPanel">
+          <div class="consensus-bar">
+            <div class="consensus-segment" id="consensusEscalate">Escalate</div>
+            <div class="consensus-segment" id="consensusIntervene">Intervene</div>
+            <div class="consensus-segment" id="consensusAlert">Alert</div>
+            <div class="consensus-segment" id="consensusObserve">Observe</div>
+          </div>
+          <div class="consensus-meta">
+            <span id="consensusMethod">weighted</span>
+            <span id="sharedPool">Pool: 0</span>
+            <span id="swarmDelta">Delta: 0%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel stream">
+        <h2>Live Stream</h2>
+        <ul id="eventList"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Benchmark Snapshot</h2>
+        <div id="benchmarkSummary" class="benchmark">
+          <p>Run benchmarks to populate this panel.</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

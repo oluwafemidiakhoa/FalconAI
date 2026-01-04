@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-01-03T10:55:19.267351",
+  "version": "0.1.0",
+  "notes": "",
+  "metrics": {
+    "perception": {
+      "events_processed": 500,
+      "events_triggered": 46,
+      "trigger_rate": 0.092
+    },
+    "decision": {
+      "decisions_made": 46,
+      "average_confidence": 0.7695652173913041
+    },
+    "correction": {
+      "corrections_made": 46,
+      "average_reward": 0.7695652173913041,
+      "correction_signals": {
+        "action_rewards": {
+          "intervene": 0.5270540072456584,
+          "escalate": 0.84185026299696
+        },
+        "action_counts": {
+          "intervene": 20,
+          "escalate": 26
+        },
+        "recent_avg_reward": 0.9,
+        "should_abort": false
+      }
+    },
+    "energy": {
+      "remaining_fraction": 0.07999999999999996,
+      "used_operations": 4600,
+      "max_operations": 5000,
+      "used_latency_ms": 1.005411148071289,
+      "max_latency_ms": 1000.0,
+      "used_energy": 230.0,
+      "max_energy": 500.0
+    },
+    "memory": {
+      "size": 46,
+      "type": "experience"
+    },
+    "performance": {
+      "events_processed": 46,
+      "avg_latency_ms": 0.021856764088506283,
+      "avg_confidence": 0.7695652173913043,
+      "success_rate": 1.0,
+      "events_per_second": 44630.57691417997,
+      "uptime_seconds": 0.003652334213256836
+    }
+  }
+}

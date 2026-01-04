@@ -1,0 +1,41 @@
+# Basic FALCON-AI Configuration
+# Simple threshold-based perception with heuristic decisions
+# Good for: Getting started, learning the system, low-complexity scenarios
+
+falcon:
+  perception:
+    type: threshold
+    params:
+      threshold: 0.7
+
+  decision:
+    type: heuristic
+    params:
+      confidence_boost: 0.1
+
+  correction:
+    type: outcome_based
+    params:
+      learning_rate: 0.1
+      abort_threshold: -5.0
+
+  energy:
+    type: simple
+    params:
+      max_operations: 10000
+
+  memory:
+    type: experience
+    params:
+      max_size: 500
+
+  monitoring: true
+
+scenario:
+  name: spike
+  length: 500
+  seed: 42
+
+output:
+  metrics_path: reports/basic_metrics.json
+  checkpoint_path: checkpoints/basic_falcon

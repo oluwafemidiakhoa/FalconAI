@@ -1,0 +1,46 @@
+# Network Security Monitoring Configuration
+# Optimized for detecting network attacks, intrusions, and anomalies
+# Good for: DDoS detection, intrusion detection, traffic analysis
+
+falcon:
+  perception:
+    type: anomaly
+    params:
+      z_threshold: 2.5
+      min_samples: 20
+
+  decision:
+    type: memory_aware
+    params:
+      memory_weight: 0.4
+      min_samples: 5
+
+  correction:
+    type: reinforcement
+    params:
+      learning_rate: 0.05
+      discount_factor: 0.95
+
+  energy:
+    type: multi_tier
+    params:
+      max_operations: 8000
+      max_latency_ms: 50.0
+      max_energy_units: 800.0
+
+  memory:
+    type: experience
+    params:
+      max_size: 1500
+
+  monitoring: true
+
+scenario:
+  name: attack
+  length: 1000
+  seed: 123
+
+output:
+  metrics_path: reports/network_security_metrics.json
+  checkpoint_path: checkpoints/network_security_falcon
+  report_dir: reports/network_security
