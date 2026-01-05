@@ -1,0 +1,66 @@
+# FALCON-AI Runtime Inference Configuration
+#
+# This configuration is optimized for inference serving via the Runtime API.
+# Use with: falcon-ai runtime --config configs/inference.yaml --port 8000
+
+falcon:
+  # Perception Layer - Selective event filtering
+  perception:
+    type: threshold
+    params:
+      threshold: 0.7  # Only process events with salience >= 0.7
+
+  # Decision Layer - Fast decision making
+  decision:
+    type: heuristic  # Fast rule-based decisions
+
+  # Correction Layer - Learn from outcomes
+  correction:
+    type: outcome_based
+    params:
+      window_size: 100
+      alpha: 0.1
+
+  # Energy Management - Budget-aware inference
+  energy:
+    type: simple
+    params:
+      max_operations: 10000      # Operations budget
+      max_latency_ms: 1000.0     # Latency budget (1 second)
+      max_energy_units: 100.0    # Energy budget
+
+  # Memory - Experience tracking
+  memory:
+    type: experience
+    params:
+      max_size: 1000
+
+# Scenario Configuration (optional - for testing)
+scenario:
+  type: spike
+  length: 1000
+
+# Output Configuration
+output:
+  format: json
+  verbose: false
+
+# Runtime API Settings (future enhancement)
+# inference:
+#   # Caching
+#   cache:
+#     enabled: true
+#     ttl_seconds: 3600
+#     max_size: 1000
+#
+#   # Cost Management
+#   cost_limits:
+#     per_request_max: 0.01
+#     daily_max: 100.0
+#
+#   # Model Registry (future)
+#   models:
+#     - name: heuristic
+#       provider: local
+#       cost_per_call: 0.0
+#       capabilities: [classification]

@@ -115,6 +115,157 @@ falcon-ai wow --config configs/wow.yaml
 - `fraud_detection.yaml` - Fraud detection
 - `high_performance.yaml` - Maximum throughput
 - `composite_perception.yaml` - Multi-faceted analysis
+- `inference.yaml` - **NEW!** Runtime API inference serving
+
+---
+
+## 🌐 Runtime Inference API
+
+FALCON includes a production-ready REST API for real-time inference serving. Use FALCON as an intelligent orchestration layer that decides **how, when, where, and whether** to invoke AI models.
+
+### Launch Inference Server
+```bash
+falcon-ai runtime --config configs/inference.yaml --port 8000
+```
+
+The server starts immediately and is ready to handle inference requests.
+
+### Inference Endpoint
+
+**POST /infer**
+
+Submit data for intelligent decision-making with selective processing.
+
+```bash
+curl -X POST http://localhost:8000/infer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": {"value": 0.85, "source": "sensor_1"},
+    "latency_budget": "100ms",
+    "confidence_target": 0.85,
+    "risk_level": "medium"
+  }'
+```
+
+**Request Parameters:**
+- `input` (required): Data to process (any JSON structure)
+- `latency_budget` (optional): Max acceptable latency (e.g., "100ms", "1s")
+- `confidence_target` (optional): Minimum confidence threshold (0.0-1.0)
+- `risk_level` (optional): Risk tolerance ("low", "medium", "high")
+- `metadata` (optional): Additional context for routing decisions
+
+**Response:**
+```json
+{
+  "trace_id": "a1b2c3d4e5f6",
+  "model": "heuristic",
+  "output": "ALERT",
+  "confidence": 0.92,
+  "latency_ms": 3.5,
+  "escalated": false,
+  "est_cost_usd": 0.0,
+  "metadata": {
+    "decision_mode": "fast",
+    "energy_used": 15
+  }
+}
+```
+
+**Response Fields:**
+- `trace_id`: Unique request identifier for tracking
+- `model`: Which model/engine was used
+- `output`: Decision result (action, classification, etc.)
+- `confidence`: Decision confidence (0.0-1.0)
+- `latency_ms`: Actual processing time
+- `escalated`: Whether request escalated to more expensive model
+- `est_cost_usd`: Estimated cost of this inference
+- `metadata`: Additional context and metrics
+
+### Health Check
+
+**GET /health**
+
+Monitor system health and performance metrics.
+
+```bash
+curl http://localhost:8000/health
+```
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "system": {
+    "perception": {
+      "trigger_rate": 0.12,
+      "total_processed": 10523
+    },
+    "decision": {
+      "average_confidence": 0.87,
+      "total_decisions": 1264
+    },
+    "energy": {
+      "remaining_fraction": 0.73,
+      "operations_used": 2700
+    },
+    "memory": {
+      "size": 142,
+      "capacity": 1000
+    }
+  }
+}
+```
+
+### Key Features
+
+**Selective Intelligence**
+- Only 5-20% of requests trigger full inference
+- 80-95% filtered by perception layer (sub-millisecond)
+- Massive cost reduction vs. processing everything
+
+**Adaptive Routing** (Coming Soon)
+- Route to cheapest adequate model
+- Escalate to powerful models only when needed
+- Learn optimal routing from outcomes
+
+**Production Ready**
+- Request tracing for debugging
+- Performance monitoring built-in
+- Cost tracking per request
+- Graceful error handling
+
+### Example Use Cases
+
+**Content Moderation:**
+```python
+import requests
+
+response = requests.post("http://localhost:8000/infer", json={
+    "input": {"text": "User comment here", "user_id": "user_123"},
+    "confidence_target": 0.9,  # High confidence for moderation
+    "risk_level": "low"  # Conservative - err on safe side
+})
+
+if response.json()["output"] == "FLAGGED":
+    review_content(response.json()["metadata"])
+```
+
+**Network Anomaly Detection:**
+```python
+for packet in network_stream:
+    response = requests.post("http://localhost:8000/infer", json={
+        "input": {
+            "source_ip": packet.src,
+            "dest_ip": packet.dst,
+            "bytes": packet.size
+        },
+        "latency_budget": "10ms",  # Real-time requirement
+        "risk_level": "high"  # Bias toward alerts
+    })
+
+    if response.json()["confidence"] > 0.95:
+        trigger_alert(packet)
+```
 
 ---
 
