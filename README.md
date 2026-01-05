@@ -217,16 +217,14 @@ Real-time event processing display:
 
 ## 🚀 What You Can Build
 
-### Example 1: Network Security Monitoring
+### Example 1: Basic Network Security
 ```python
 from falcon import FalconAI, ThresholdPerception, HeuristicDecision
-from falcon.ml import NeuralPerception, MLDecisionCore
-from falcon.distributed import FalconSwarm
 
-# ML-powered network monitor
+# Simple threshold-based monitoring
 falcon = FalconAI(
-    perception=NeuralPerception(input_dim=10),
-    decision=MLDecisionCore(model_type='random_forest'),
+    perception=ThresholdPerception(threshold=0.7),
+    decision=HeuristicDecision(),
     correction=OutcomeBasedCorrection(),
     energy_manager=SimpleEnergyManager(),
     memory=ExperienceMemory()
@@ -237,11 +235,34 @@ for packet in traffic_stream:
     decision = falcon.process(packet)
     if decision:
         handle_threat(decision)
+```
+
+### Example 2: ML-Powered Network Security
+```python
+from falcon.ml import NeuralPerception, MLDecisionCore
+
+# ML-powered network monitor
+falcon = FalconAI(
+    perception=NeuralPerception(input_dim=10),
+    decision=MLDecisionCore(model_type='random_forest'),
+    correction=OutcomeBasedCorrection(),
+    energy_manager=SimpleEnergyManager(),
+    memory=ExperienceMemory()
+)
+
+# Train on historical data
+falcon.perception.train(X_historical, y_historical)
+
+# Process with continuous learning
+for packet in traffic_stream:
+    decision = falcon.process(packet)
+    if decision:
+        handle_threat(decision)
         outcome = verify_threat(packet)
         falcon.observe(decision, outcome)  # Learns continuously
 ```
 
-### Example 2: Multi-Agent Swarm
+### Example 3: Multi-Agent Swarm
 ```python
 from falcon.distributed import FalconSwarm
 
@@ -255,16 +276,19 @@ swarm = FalconSwarm(
 # Swarm consensus decision
 decision = swarm.process(data, use_consensus=True)
 # 90-98% accuracy vs 80-90% single agent!
+
+# All agents learn from outcome
+swarm.observe(decision, outcome)
 ```
 
-### Example 3: Save & Deploy
+### Example 4: Save & Deploy
 ```python
 from falcon.persistence import save_falcon, load_falcon
 
 # Train offline
-falcon.process_training_data(historical_data)
+falcon.perception.train(X_train, y_train)
 
-# Save model
+# Save model with metadata
 save_falcon(falcon, "models/production_v1")
 
 # Deploy to production
@@ -321,6 +345,211 @@ FALCON-AI is built on a unique 5-layer architecture:
 
 ---
 
+## 🔬 Advanced Features & Production Components
+
+### ML-Powered Perception
+
+#### NeuralPerception
+Neural network-based learned perception using sklearn's MLPClassifier:
+```python
+from falcon.ml import NeuralPerception
+
+perception = NeuralPerception(
+    input_dim=10,                    # Feature vector size
+    hidden_layers=(64, 32),          # Neural network architecture
+    salience_threshold=0.7           # Detection threshold
+)
+
+# Train on historical data
+perception.train(X_train, y_train)
+
+# Or use online learning
+perception.update(data, is_salient=True)
+```
+
+#### OnlineNeuralPerception
+Adaptive perception that learns from the data stream:
+```python
+from falcon.ml import OnlineNeuralPerception
+
+perception = OnlineNeuralPerception(
+    input_dim=10,
+    window_size=100,
+    adaptation_rate=0.1
+)
+# Automatically adapts threshold based on stream statistics
+```
+
+### ML-Based Decision Making
+
+#### MLDecisionCore
+Ensemble machine learning for decisions:
+```python
+from falcon.ml import MLDecisionCore
+
+decision = MLDecisionCore(
+    model_type='random_forest',      # or 'gradient_boosting'
+    n_estimators=100,
+    min_training_samples=50
+)
+
+# Train from successful decisions
+decision.update(event, successful_action)
+```
+
+#### EnsembleDecision
+Combines multiple decision cores:
+```python
+from falcon.ml import EnsembleDecision
+
+ensemble = EnsembleDecision(
+    decision_cores=[core1, core2, core3],
+    voting='soft'  # Weighted by confidence
+)
+```
+
+### Multi-Agent Swarm Intelligence
+
+#### FalconSwarm Features
+- **Shared Experience Pool** - Agents share collective knowledge
+- **Consensus Voting** - Multiple voting strategies (majority, weighted, unanimous)
+- **Load Distribution** - Automatic load balancing
+- **Collective Learning** - All agents benefit from each agent's experiences
+
+```python
+from falcon.distributed import FalconSwarm
+
+swarm = FalconSwarm(
+    num_agents=5,
+    agent_factory=create_agent,
+    consensus_method='weighted'
+)
+
+# Get swarm statistics
+stats = swarm.get_swarm_status()
+load_dist = swarm.get_load_distribution()
+```
+
+#### SharedExperiencePool
+Centralized memory for swarm coordination:
+```python
+from falcon.distributed import SharedExperiencePool
+
+pool = SharedExperiencePool(max_size=10000)
+
+# Agents contribute experiences
+pool.add_experience(agent_id, experience)
+
+# Query for similar situations
+experiences = pool.query_experiences(
+    situation='network_anomaly',
+    min_reward=0.5,
+    limit=10
+)
+```
+
+### Model Persistence
+
+#### Save Models
+```python
+from falcon.persistence import save_falcon, FalconCheckpoint
+
+checkpoint = FalconCheckpoint(
+    timestamp="2025-01-03",
+    notes="Production model v1.2 - trained on 1M samples"
+)
+
+save_falcon(
+    falcon,
+    filepath="models/production_v1",
+    checkpoint_info=checkpoint,
+    include_metrics=True
+)
+```
+
+Creates:
+- `production_v1.falcon` - Complete model state
+- `production_v1.json` - Human-readable metadata
+
+#### Load Models
+```python
+from falcon.persistence import load_falcon
+
+falcon = load_falcon("models/production_v1")
+# Model is ready to use immediately
+decision = falcon.process(data)
+```
+
+### Production Deployment Patterns
+
+#### Pattern 1: Single Agent with ML
+```python
+# Create ML-powered FALCON
+falcon = FalconAI(
+    perception=NeuralPerception(input_dim=20),
+    decision=MLDecisionCore(model_type='random_forest'),
+    correction=OutcomeBasedCorrection(),
+    energy_manager=SimpleEnergyManager(),
+    memory=ExperienceMemory()
+)
+
+# Process production stream
+for data in production_stream:
+    decision = falcon.process(vectorize(data))
+    if decision:
+        outcome = execute_in_production(decision)
+        falcon.observe(decision, outcome)
+
+# Save periodically
+if should_checkpoint():
+    save_falcon(falcon, f"models/hourly_{timestamp}")
+```
+
+#### Pattern 2: Multi-Agent Swarm
+```python
+# Deploy swarm across multiple workers
+swarm = FalconSwarm(
+    num_agents=10,
+    agent_factory=create_production_agent,
+    consensus_method='weighted'
+)
+
+# Distributed processing
+for data in distributed_stream:
+    decision = swarm.process(data, use_consensus=True)
+    if decision:
+        outcome = execute(decision)
+        swarm.observe(decision, outcome)
+
+# Monitor swarm health
+stats = swarm.get_swarm_status()
+if stats['average_confidence'] < threshold:
+    alert_ops_team()
+```
+
+### Monitoring & Observability
+
+#### System Metrics
+```python
+status = falcon.get_status()
+
+print(f"Trigger rate: {status['perception']['trigger_rate']}")
+print(f"Avg confidence: {status['decision']['average_confidence']}")
+print(f"Avg reward: {status['correction']['average_reward']}")
+print(f"Energy remaining: {status['energy']['remaining_fraction']}")
+```
+
+#### Swarm Metrics
+```python
+swarm_stats = swarm.get_swarm_status()
+
+print(f"Total agents: {swarm_stats['num_agents']}")
+print(f"Shared experiences: {swarm_stats['shared_pool']['total_experiences']}")
+print(f"Consensus confidence: {swarm_stats['average_confidence']}")
+```
+
+---
+
 ## 📊 Performance Benchmarks
 
 | Configuration | Accuracy | Throughput | Latency | Efficiency |
@@ -357,14 +586,15 @@ FALCON-AI is built on a unique 5-layer architecture:
 
 ### Getting Started
 - [GET_STARTED.md](GET_STARTED.md) - 5-minute quick start
-- [CLI_GUIDE.md](CLI_GUIDE.md) - **NEW!** Complete CLI usage guide
+- [CLI_GUIDE.md](CLI_GUIDE.md) - Complete CLI usage guide
+- [QUICK_START.md](QUICK_START.md) - Command cheat sheet
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System design deep dive
-- [USAGE_GUIDE.md](USAGE_GUIDE.md) - Complete API reference
 
-### Advanced Topics
-- [README_ADVANCED.md](README_ADVANCED.md) - Production features
+### Reference & Guides
+- [USAGE_GUIDE.md](USAGE_GUIDE.md) - Complete API reference
 - [WHATS_NEW.md](WHATS_NEW.md) - Latest features (v0.2.0)
 - [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - Complete overview
+- [NEXT_STEPS.md](NEXT_STEPS.md) - What to do next
 
 ### Configuration
 - [configs/README.md](configs/README.md) - **NEW!** Configuration guide
