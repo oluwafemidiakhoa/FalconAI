@@ -21,6 +21,10 @@ from ..config import load_config, normalize_config, build_falcon, FalconSpec
 from ..core import FalconAI
 from ..ml.inference_cache import InferenceCache
 from ..ml.cost_manager import CostManager
+from ..ml.model_registry import (
+    ModelRegistry, ModelSpec, ModelProvider, ModelCapability,
+    RoutingContext
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -51,9 +55,10 @@ def create_app(config_path: Optional[str] = None) -> FastAPI:
     # Global state for the Falcon instance
     falcon_instance: Optional[FalconAI] = None
 
-    # Initialize cache and cost manager
+    # Initialize cache, cost manager, and model registry
     cache = InferenceCache(ttl_seconds=3600, max_size=1000)
     cost_manager = CostManager(daily_limit=100.0, monthly_limit=2000.0)
+    registry = ModelRegistry()
 
     @app.on_event("startup")
     async def startup_event():
@@ -68,6 +73,37 @@ def create_app(config_path: Optional[str] = None) -> FastAPI:
             logger.info("Falcon Runtime initialized successfully")
             logger.info(f"Cache enabled: TTL={cache.ttl}s, Max={cache.max_size}")
             logger.info(f"Cost limits: Daily=${cost_manager.daily_limit}, Monthly=${cost_manager.monthly_limit}")
+
+            # Register default local model (FALCON heuristic)
+            def falcon_inference(input_data: Any, context: Dict) -> Dict:
+                """Default FALCON inference function."""
+                decision = falcon_instance.process(input_data, context)
+                if decision is None:
+                    return {
+                        "output": None,
+                        "confidence": 0.0,
+                        "cost_usd": 0.0,
+                        "metadata": {"status": "ignored"}
+                    }
+                return {
+                    "output": decision.action.value if hasattr(decision.action, "value") else str(decision.action),
+                    "confidence": decision.confidence,
+                    "cost_usd": decision.metadata.get("cost_usd", 0.0001),
+                    "metadata": decision.metadata or {}
+                }
+
+            registry.register(ModelSpec(
+                name="falcon-heuristic",
+                provider=ModelProvider.LOCAL,
+                model_id="falcon-default",
+                avg_latency_ms=10.0,
+                cost_per_1k_tokens=0.0,
+                capabilities=[ModelCapability.CLASSIFICATION, ModelCapability.REASONING],
+                inference_fn=falcon_inference,
+                metadata={"description": "Fast local FALCON heuristic engine"}
+            ))
+            logger.info("Registered default model: falcon-heuristic")
+
         except Exception as e:
             logger.error(f"Failed to initialize Falcon: {e}")
             raise RuntimeError(f"Could not load Falcon config: {e}")
@@ -194,5 +230,94 @@ def create_app(config_path: Optional[str] = None) -> FastAPI:
     async def costs_alert(threshold: float = 0.8):
         """Check if spending is approaching limits."""
         return cost_manager.should_alert(threshold=threshold)
+
+    # Model Registry Endpoints
+
+    @app.get("/models")
+    async def list_models(capability: Optional[str] = None,
+                         provider: Optional[str] = None,
+                         enabled_only: bool = True):
+        """
+        List registered models.
+
+        Query parameters:
+        - capability: Filter by capability (classification, generation, chat, etc.)
+        - provider: Filter by provider (local, openai, anthropic, etc.)
+        - enabled_only: Only show enabled models (default: true)
+        """
+        cap = ModelCapability(capability) if capability else None
+        prov = ModelProvider(provider) if provider else None
+
+        models = registry.list_models(capability=cap, provider=prov, enabled_only=enabled_only)
+
+        return {
+            "models": [
+                {
+                    "name": m.name,
+                    "provider": m.provider.value,
+                    "model_id": m.model_id,
+                    "avg_latency_ms": m.avg_latency_ms,
+                    "cost_per_1k_tokens": m.cost_per_1k_tokens,
+                    "capabilities": [c.value for c in m.capabilities],
+                    "enabled": m.enabled,
+                    "metadata": m.metadata
+                }
+                for m in models
+            ],
+            "total": len(models)
+        }
+
+    @app.get("/models/{model_name}")
+    async def get_model(model_name: str):
+        """Get details for a specific model."""
+        model = registry.get_model(model_name)
+        if not model:
+            raise HTTPException(status_code=404, detail=f"Model not found: {model_name}")
+
+        return {
+            "name": model.name,
+            "provider": model.provider.value,
+            "model_id": model.model_id,
+            "avg_latency_ms": model.avg_latency_ms,
+            "cost_per_1k_tokens": model.cost_per_1k_tokens,
+            "max_tokens": model.max_tokens,
+            "capabilities": [c.value for c in model.capabilities],
+            "avg_confidence": model.avg_confidence,
+            "success_rate": model.success_rate,
+            "rate_limit_rpm": model.rate_limit_rpm,
+            "enabled": model.enabled,
+            "metadata": model.metadata
+        }
+
+    @app.get("/models/{model_name}/performance")
+    async def get_model_performance(model_name: str):
+        """Get runtime performance statistics for a model."""
+        perf = registry.get_performance(model_name)
+        if not perf:
+            raise HTTPException(status_code=404, detail=f"No performance data for: {model_name}")
+        return perf
+
+    @app.get("/registry/stats")
+    async def registry_stats():
+        """Get overall registry statistics."""
+        return registry.get_registry_stats()
+
+    @app.post("/models/{model_name}/enable")
+    async def enable_model(model_name: str):
+        """Enable a model."""
+        model = registry.get_model(model_name)
+        if not model:
+            raise HTTPException(status_code=404, detail=f"Model not found: {model_name}")
+        model.enabled = True
+        return {"status": "ok", "message": f"Model {model_name} enabled"}
+
+    @app.post("/models/{model_name}/disable")
+    async def disable_model(model_name: str):
+        """Disable a model."""
+        model = registry.get_model(model_name)
+        if not model:
+            raise HTTPException(status_code=404, detail=f"Model not found: {model_name}")
+        model.enabled = False
+        return {"status": "ok", "message": f"Model {model_name} disabled"}
 
     return app

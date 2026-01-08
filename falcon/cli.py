@@ -69,6 +69,11 @@ def main() -> None:
     wow_parser.add_argument("--port", type=int, default=8000, help="Bind port")
     wow_parser.add_argument("--no-browser", action="store_true", help="Don't auto-open browser")
 
+    runtime_parser = subparsers.add_parser("runtime", help="Run Falcon Runtime API server")
+    runtime_parser.add_argument("--config", type=str, help="Path to YAML/JSON config")
+    runtime_parser.add_argument("--host", type=str, default="127.0.0.1", help="Bind host")
+    runtime_parser.add_argument("--port", type=int, default=8000, help="Bind port")
+
     args = parser.parse_args()
 
     if args.command == "run":
@@ -81,6 +86,8 @@ def main() -> None:
         _swarm_command(args)
     elif args.command == "wow":
         _wow_command(args)
+    elif args.command == "runtime":
+        _runtime_command(args)
 
 
 def _load_config_dict(path: Optional[str]) -> Dict[str, Any]:
@@ -283,6 +290,22 @@ def _wow_command(args: argparse.Namespace) -> None:
         raise RuntimeError("uvicorn is required to run the dashboard server") from exc
 
     print("[OK] Starting server (Ctrl+C to stop)...")
+    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+
+
+def _runtime_command(args: argparse.Namespace) -> None:
+    """Launch the Falcon Runtime API."""
+    from .runtime.api import create_app
+
+    print(f"[OK] Starting Falcon Runtime API at http://{args.host}:{args.port}")
+    
+    app = create_app(config_path=args.config)
+
+    try:
+        import uvicorn
+    except ImportError as exc:
+        raise RuntimeError("uvicorn is required to run the runtime server") from exc
+
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 
